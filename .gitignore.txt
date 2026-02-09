@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.log
+*.pth
+*.pt
+*.ckpt
+checkpoints/
+logs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
