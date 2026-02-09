@@ -1,5 +1,7 @@
 # MIQANet: A Novel Dual-Branch Deep Learning Framework for MRI Image Quality Assessment
 
+[![DOI](https://img.shields.io/badge/DOI-10.1109%2FTCSVT.2026.3656671-blue)](https://doi.org/10.1109/TCSVT.2026.3656671)
+
 Official code repository for the MIQANet MRI image quality assessment model.
 
 ---
