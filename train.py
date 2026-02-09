@@ -8,7 +8,7 @@ import random
 
 from torchvision import transforms
 from torch.utils.data import DataLoader
-from models.maniqa import MANIQA
+from models.MIQANet import MIQANet
 from config import Config
 from utils.process import RandCrop, ToTensor, RandHorizontalFlip, Normalize, five_point_crop
 from scipy.stats import spearmanr, pearsonr
@@ -214,23 +214,54 @@ if __name__ == '__main__':
 
     writer = SummaryWriter(config.tensorboard_path)
 
+        if config.dataset_name == 'kadid10k':
+        from data.kadid10k.kadid10k import Kadid10k
+        train_name, val_name = split_dataset_kadid10k(
+            txt_file_name=config.kadid10k_label,
+            split_seed=config.split_seed
+        )
+        dis_train_path = config.kadid10k_path
+        dis_val_path = config.kadid10k_path
+        label_train_path = config.kadid10k_label
+        label_val_path = config.kadid10k_label
+        Dataset = Kadid10k
+    elif config.dataset_name == 'pipal':
+        from data.PIPAL22.pipal import PIPAL
+        dis_train_path = config.train_dis_path
+        dis_val_path = config.val_dis_path
+        label_train_path = config.pipal22_train_label
+        label_val_path = config.pipal22_val_txt_label
+        Dataset = PIPAL
+    elif config.dataset_name == 'koniq10k':
+        from data.koniq10k.koniq10k import Koniq10k
+        train_name, val_name = split_dataset_koniq10k(
+            txt_file_name=config.koniq10k_label,
+            split_seed=config.split_seed
+        )
+        dis_train_path = config.koniq10k_path
+        dis_val_path = config.koniq10k_path
+        label_train_path = config.koniq10k_label
+        label_val_path = config.koniq10k_label
+        Dataset = Koniq10k
+    else:
+        pass
+    
     # data load
-    train_dataset = PIPAL21(
-        dis_path=config.train_dis_path,
-        txt_file_name=config.train_txt_file_name,
-        transform=transforms.Compose(
-            [
-                RandCrop(config.crop_size),
-                Normalize(0.5, 0.5),
-                RandHorizontalFlip(),
-                ToTensor()
-            ]
-        ),
+    train_dataset = Dataset(
+        dis_path=dis_train_path,
+        txt_file_name=label_train_path,
+        list_name=train_name,
+        transform=transforms.Compose([RandCrop(patch_size=config.crop_size), 
+            Normalize(0.5, 0.5), RandHorizontalFlip(prob_aug=config.prob_aug), ToTensor()]),
+        keep_ratio=config.train_keep_ratio
     )
-    val_dataset = PIPAL21(
-        dis_path=config.val_dis_path,
-        txt_file_name=config.val_txt_file_name,
-        transform=transforms.Compose([Normalize(0.5, 0.5), ToTensor()]),
+    val_dataset = Dataset(
+        dis_path=dis_val_path,
+        txt_file_name=label_val_path,
+        list_name=val_name,
+        transform=transforms.Compose([RandCrop(patch_size=config.crop_size),
+            Normalize(0.5, 0.5), ToTensor()]),
+        keep_ratio=config.val_keep_ratio
     )
 
     logging.info('number of train scenes: {}'.format(len(train_dataset)))
@@ -250,7 +281,7 @@ if __name__ == '__main__':
         drop_last=True,
         shuffle=False
     )
-    net = MANIQA(
+    net = MIQANet(
         embed_dim=config.embed_dim,
         num_outputs=config.num_outputs,
         dim_mlp=config.dim_mlp,
