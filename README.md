@@ -8,6 +8,17 @@ Image quality assessment (IQA) algorithms have significantly advanced over the p
 ## Network Architecture
 ![Network Architecture](Network/Overall_architecture_new.jpg)
 
+## Dataset
+
+MIQANet is developed and evaluated using the **RAD-IQMRI** radiologist-rated MRI image quality assessment benchmark dataset.
+
+RAD-IQMRI GitHub repository:  
+https://github.com/dayan0204/RAD-IQMRI
+
+If you use MIQANet together with this dataset, please also cite the RAD-IQMRI dataset paper.
+
+---
+
 ## **USAGE**
 ```sh
 python train.py
